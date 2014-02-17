@@ -40,7 +40,8 @@ private:
     void ReadSequenceToVector(ifstream &,
         GenomeSequenceInfo &,
         GenomeSequenceInfo &,
-        GenomeSequenceInfo &);
+        GenomeSequenceInfo &,
+        string);
 
     void RemoveRedundancyAndShort(GenomeSequenceInfo &);
 

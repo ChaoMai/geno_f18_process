@@ -27,6 +27,9 @@
     <ClCompile Include="pattern.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="merge.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="f18init.h">
@@ -42,6 +45,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="types.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="merge.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

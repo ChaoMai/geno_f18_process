@@ -82,12 +82,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="f18init.cpp" />
+    <ClCompile Include="merge.cpp" />
     <ClCompile Include="pattern.cpp" />
     <ClCompile Include="sequence.cpp" />
     <ClCompile Include="utilities.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="f18init.h" />
+    <ClInclude Include="merge.h" />
     <ClInclude Include="pattern.h" />
     <ClInclude Include="sequence.h" />
     <ClInclude Include="types.h" />

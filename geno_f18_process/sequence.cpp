@@ -4,17 +4,16 @@ Sequence::Sequence(string f, string h, string o, string p)
 :filesLocation(f), homologousAnnotationFile(h), outputLocation(o), prankExeLocation(p)
 {
     wstring wStr = wstring(outputLocation.begin(), outputLocation.end());
-    cout << "create output folder" << endl;
+    cout << "create output folder: \"" << outputLocation << "\"" << endl;
     _wmkdir(wStr.c_str());
 
     filesLocation.append("\\");
     outputLocation.append("\\");
-    prankExeLocation.append("\\prank.exe");
 }
 
 void Sequence::LoadHomologousAnnotationFile()
 {
-    string fileName = filesLocation + homologousAnnotationFile;
+    string fileName = homologousAnnotationFile;
     ifstream ifs;
 
     ifs.open(fileName.c_str());
@@ -22,11 +21,15 @@ void Sequence::LoadHomologousAnnotationFile()
     if (!ifs)
     {
         cerr << "fatal error: failed to open homologous annotation file" << endl;
-        system("pause");
+        exit(1);
     }
 
+    cout << "loading homologous annotation file. " << endl;
+
+    int tmp = 0;
     while (!ifs.eof())
     {
+        tmp++;
         char chs[200];
 
         int id;
@@ -34,12 +37,50 @@ void Sequence::LoadHomologousAnnotationFile()
         string str;
 
         ifs.getline(chs, 199, ',');
+        if (strlen(chs) == 0)
+        {
+            break;
+        }
         id = atoi(chs);
+
         ifs.getline(chs, 199, ',');
+        if (strlen(chs) == 0)
+        {
+            break;
+        }
         name = chs;
         getline(ifs, str);
 
-        homologousAnnotations.push_back({ id, name });
+        auto insertAnnotation =
+            [this](HomologousAnnotation anno)
+        {
+            int hIndex = 0;
+            int tIndex = distance(homologousAnnotations.begin(), homologousAnnotations.end()) - 1;
+            int midIndex = 0;
+
+            while (hIndex <= tIndex)
+            {
+                midIndex = (hIndex + tIndex) / 2;
+
+                if (anno.genoName > next(homologousAnnotations.begin(), midIndex)->genoName)
+                {
+                    hIndex = midIndex + 1;
+                }
+                else if (anno.genoName < next(homologousAnnotations.begin(), midIndex)->genoName)
+                {
+                    tIndex = midIndex - 1;
+                }
+                else
+                {
+                    break;
+                }
+
+            }
+
+            homologousAnnotations.insert(next(homologousAnnotations.begin(), midIndex), anno);
+        };
+
+        insertAnnotation(HomologousAnnotation(id, name));
     }
 
     ifs.close();
@@ -122,11 +163,11 @@ void Sequence::LoadSequenceFiles(vector<int> ids,
 
         if (!ifs)
         {
-            cerr << "fatal error: failed to open homologous annotation file" << endl;
-            system("pause");
+            cerr << "fatal error: failed to open sequence file " << fileId << endl;
+            exit(1);
         }
 
-        ReadSequenceToVector(ifs, FSequence, HSequence, LSequence);
+        ReadSequenceToVector(ifs, FSequence, HSequence, LSequence, fileId);
         ifs.close();
     }
 }
@@ -134,7 +175,8 @@ void Sequence::LoadSequenceFiles(vector<int> ids,
 void Sequence::ReadSequenceToVector(ifstream &ifs,
     GenomeSequenceInfo &FSequence,
     GenomeSequenceInfo &HSequence,
-    GenomeSequenceInfo &LSequence)
+    GenomeSequenceInfo &LSequence,
+    string fileId)
 {
     while (!ifs.eof())
     {
@@ -182,7 +224,7 @@ void Sequence::ReadSequenceToVector(ifstream &ifs,
             {
                 FSequence.maxiumLength = tmpSequence.length();
             }
-            FSequence.Sequences.push_back({ tmpId, tmpName, tmpBaseInfo, tmpSequence });
+            FSequence.Sequences.push_back(GenomeSequence(tmpId, tmpName, tmpBaseInfo, tmpSequence));
             break;
         }
         case'h':
@@ -191,7 +233,7 @@ void Sequence::ReadSequenceToVector(ifstream &ifs,
             {
                 HSequence.maxiumLength = tmpSequence.length();
             }
-            HSequence.Sequences.push_back({ tmpId, tmpName, tmpBaseInfo, tmpSequence });
+            HSequence.Sequences.push_back(GenomeSequence(tmpId, tmpName, tmpBaseInfo, tmpSequence));
             break;
         }
         case'l':
@@ -200,12 +242,12 @@ void Sequence::ReadSequenceToVector(ifstream &ifs,
             {
                 LSequence.maxiumLength = tmpSequence.length();
             }
-            LSequence.Sequences.push_back({ tmpId, tmpName, tmpBaseInfo, tmpSequence });
+            LSequence.Sequences.push_back(GenomeSequence(tmpId, tmpName, tmpBaseInfo, tmpSequence));
             break;
         }
         default:
-            cerr << "error occoured in reading genome files" << endl;
-            system("pause");
+            cerr << "fatal error: error occoured in reading genome file " << fileId << endl;
+            exit(1);
         }
     }
 }
@@ -251,8 +293,8 @@ void Sequence::CompareAndRemove(GenomeSequenceInfo &FSequences,
 
     if (!ifs)
     {
-        cerr << "fatal error: failed to open file." << endl;
-        system("pause");
+        cerr << "fatal error: failed to open file tmp.best.fas" << endl;
+        exit(1);
     }
 
     GenomeSequenceInfo RFSequences;
@@ -295,8 +337,8 @@ void Sequence::ExportToFaFile(string fileName,
 
     if (!ofs)
     {
-        cerr << "fatal error: failed to open file to write" << endl;
-        system("pause");
+        cerr << "fatal error: failed to open file " << fileName << " to write" << endl;
+        exit(1);
     }
 
     ofs << sstr.rdbuf();
@@ -409,7 +451,7 @@ void Sequence::ReadPrankSequenceToVector(ifstream &ifs,
             {
                 RFSequences.maxiumLength = tmpSequence.length();
             }
-            RFSequences.Sequences.push_back({ tmpId, tmpName, tmpBaseInfo, tmpSequence });
+            RFSequences.Sequences.push_back(GenomeSequence(tmpId, tmpName, tmpBaseInfo, tmpSequence));
             break;
         }
         case'h':
@@ -418,7 +460,7 @@ void Sequence::ReadPrankSequenceToVector(ifstream &ifs,
             {
                 RHSequences.maxiumLength = tmpSequence.length();
             }
-            RHSequences.Sequences.push_back({ tmpId, tmpName, tmpBaseInfo, tmpSequence });
+            RHSequences.Sequences.push_back(GenomeSequence(tmpId, tmpName, tmpBaseInfo, tmpSequence));
             break;
         }
         case'l':
@@ -427,12 +469,12 @@ void Sequence::ReadPrankSequenceToVector(ifstream &ifs,
             {
                 RLSequences.maxiumLength = tmpSequence.length();
             }
-            RLSequences.Sequences.push_back({ tmpId, tmpName, tmpBaseInfo, tmpSequence });
+            RLSequences.Sequences.push_back(GenomeSequence(tmpId, tmpName, tmpBaseInfo, tmpSequence));
             break;
         }
         default:
-            cerr << "error occoured in reading genome files" << endl;
-            system("pause");
+            cerr << "fatal error: error occoured in reading prank files tmp.best.fas" << endl;
+            exit(1);
         }
     }
 }

@@ -82,7 +82,7 @@ void Pattern::Differentiate(GenomeSequenceInfo &FSequence,
                     }
                 }
 
-                if ((mutationPointCount / fStr.size()) <= 0.2)
+                if ((mutationPointCount / fStr.size()) <= 0.1)
                 {
                     string reducedStr;
                     ReduceSequence(fSeqEncode, reducedStr);
@@ -102,7 +102,7 @@ void Pattern::Differentiate(GenomeSequenceInfo &FSequence,
                         string lName = lItera->sequenceId + "_" + lItera->sequenceName;
                         string fName = fItera->sequenceId + "_" + fItera->sequenceName;
                         patternsInfo.SetActiNumber(2);
-                        patternsInfo.Patterns.push_back({ hName, lName, fName, patternNumber });
+                        patternsInfo.Patterns.push_back(MultiplePattern(hName, lName, fName, patternNumber));
                         break;
                     }
                     case 6:
@@ -113,6 +113,16 @@ void Pattern::Differentiate(GenomeSequenceInfo &FSequence,
                         patternsInfo.patternNubmer = patternNumber;
                         return;
                     }
+                    case 8:
+                    {
+                        //pattern 8
+                        string hName = hItera->sequenceId + "_" + hItera->sequenceName;
+                        string lName = lItera->sequenceId + "_" + lItera->sequenceName;
+                        string fName = fItera->sequenceId + "_" + fItera->sequenceName;
+                        patternsInfo.SetActiNumber(2);
+                        patternsInfo.Patterns.push_back(MultiplePattern(hName, lName, fName, 8));
+                        break;
+                    }
                     }
                 }
                 else
@@ -122,7 +132,7 @@ void Pattern::Differentiate(GenomeSequenceInfo &FSequence,
                     string lName = lItera->sequenceId + "_" + lItera->sequenceName;
                     string fName = fItera->sequenceId + "_" + fItera->sequenceName;
                     patternsInfo.SetActiNumber(2);
-                    patternsInfo.Patterns.push_back({ hName, lName, fName, 8 });
+                    patternsInfo.Patterns.push_back(MultiplePattern(hName, lName, fName, 8));
                 }
             }
         }
@@ -197,8 +207,9 @@ int Pattern::CheckPattern(string reducedStr)
 
     if (length <= 0)
     {
-        cerr << "fatal error: reducing error" << endl;
-        system("pause");
+        return 8;
+        //cerr << "fatal error: reducing error" << endl;
+        //exit(1);
     }
 
     if (length == 1)
@@ -257,8 +268,8 @@ void Pattern::ExportToPatternFile(PatternsInfo info)
 
     if (!ofs)
     {
-        cerr << "fatal error: failed to open file to write" << endl;
-        system("pause");
+        cerr << "fatal error: failed to open file pattern_hebing_" << saveId << " to write" << endl;
+        exit(1);
     }
 
     stringstream sstr;
@@ -289,8 +300,8 @@ void Pattern::ExportToPatternFile(PatternsInfo info)
     }
     default:
     {
-        cerr << "acti_member isn't seted!" << endl;
-        system("pause");
+        cerr << "fatal error: acti_member isn't seted for " << saveId << endl;
+        exit(1);
         break;
     }
     }

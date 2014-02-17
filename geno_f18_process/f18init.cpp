@@ -30,6 +30,15 @@ int main(int argc, char* argv[])
             << time.AllTime()
             << " secs passed."
             << endl;
+
+        Merge merge(outputLocation);
+        cout << "merging pattern files. " << endl;
+        merge.MergePatternFiles();
+
+        cout << "All done. "
+            << time.AllTime()
+            << " secs passed."
+            << endl;
     }
     catch (exception e)
     {

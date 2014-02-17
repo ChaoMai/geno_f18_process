@@ -10,6 +10,9 @@ struct HomologousAnnotation
 {
     int fileId;
     string genoName;
+
+    HomologousAnnotation(int f, string g)
+        :fileId(f), genoName(g) {}
 };
 
 struct GenomeSequence
@@ -18,23 +21,29 @@ struct GenomeSequence
     string sequenceName;
     string sequenceBaseInfo;
     string sequence;
+
+    GenomeSequence(string i, string n, string b, string s)
+        :sequenceId(i), sequenceName(n), sequenceBaseInfo(b), sequence(s) {}
 };
 
-typedef struct GenomeSequenceInfo
+struct GenomeSequenceInfo
 {
     unsigned int maxiumLength;
     vector<GenomeSequence> Sequences;
 
     GenomeSequenceInfo() :maxiumLength(0){};
-} GenomeSequenceInfo;
+};
 
-typedef struct MultiplePattern
+struct MultiplePattern
 {
     string HName;
     string LName;
     string FName;
     int patternNumber;
-}MultiplePattern;
+
+    MultiplePattern(string h, string l, string f, int p)
+        :HName(h), LName(l), FName(f), patternNumber(p) {}
+};
 
 struct PatternsInfo
 {
@@ -62,5 +71,12 @@ public:
 private:
     int acti_member;
 };
+
+struct PatternFile
+{
+    string fileName;
+    string patterns;
+};
+
 
 #endif //_TYPES_H_
