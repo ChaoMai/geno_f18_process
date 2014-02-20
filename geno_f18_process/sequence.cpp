@@ -140,7 +140,7 @@ void Sequence::ProcessSequence(vector<int> ids, string genoName)
     //remove the one has gap but its information is already include in bigger one
     //remove 10bp in head and tail
     char chs[200];
-    _itoa(ids[0], chs, 10);
+    _itoa_s(ids[0], chs, 10);
     string saveId(chs);
     CompareAndRemove(FSequences, HSequences, LSequences, saveId);
 }
@@ -153,7 +153,7 @@ void Sequence::LoadSequenceFiles(vector<int> ids,
     for (vector<int>::iterator itera = ids.begin(); itera != ids.end(); itera++)
     {
         char chs[50];
-        _itoa(*itera, chs, 10);
+        _itoa_s(*itera, chs, 10);
         string fileId(chs);
         string fileName = filesLocation + "hebing_" + fileId + ".fa";
         cout << "load hebing_" + fileId + ".fa" << endl;

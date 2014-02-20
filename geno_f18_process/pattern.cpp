@@ -300,8 +300,9 @@ void Pattern::ExportToPatternFile(PatternsInfo info)
     }
     default:
     {
-        cerr << "fatal error: acti_member isn't seted for " << saveId << endl;
-        exit(1);
+        sstr << "none";
+        //cerr << "fatal error: acti_member isn't seted for " << saveId << endl;
+        //exit(1);
         break;
     }
     }

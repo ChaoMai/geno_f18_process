@@ -60,11 +60,14 @@ void Merge::ReadPatterns(string folder, vector<string> files, vector<PatternFile
 
         ifs >> row1;
 
-        if (row1 != "pattern_id")
+        if (row1 == "none")
+        {
+            continue;
+        }
+        else if (row1 != "pattern_id")
         {
             cerr << "fatal error: file " << file << " has error" << endl;
             exit(1);
-
         }
 
         string row2;

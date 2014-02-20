@@ -1,8 +1,6 @@
 #ifndef _SEQUENCE_H_
 #define _SEQUENCE_H_
 
-#define _CRT_SECURE_NO_WARNINGS
-
 #include <algorithm>
 #include <fstream>
 #include <iostream>
