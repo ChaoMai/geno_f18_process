@@ -114,11 +114,6 @@ void Sequence::ProcessData()
             ids.clear();
             ids.push_back(itera->fileId);
         }
-
-        if (count % 500 == 0 && count != 0)
-        {
-            cout << count << " processed" << endl;
-        }
     }
 }
 
@@ -283,7 +278,7 @@ void Sequence::CompareAndRemove(GenomeSequenceInfo &FSequences,
 {
     ExportToFaFile("tmp.fa", FSequences, HSequences, LSequences);
 
-    string cmd = prankExeLocation + "\" -d=tmp.fa -o=tmp  -iterate=2 -F\"";
+    string cmd = prankExeLocation + "\" -d=tmp.fa -o=tmp  -iterate=2 -quiet -F\"";
     cmd.insert(cmd.begin(), '\"');
     cmd.insert(cmd.begin(), '\"');
     system(cmd.c_str());
@@ -665,7 +660,7 @@ void Sequence::LoadBps(vector<vector<char>> &bps, GenomeSequenceInfo &Seqs, bool
         itera != Seqs.Sequences.end(); itera++)
     {
         int endPos;
-        if (itera->sequence.size() < 100)
+        if (itera->sequence.length() < 100)
         {
             endPos = itera->sequence.length();
         }

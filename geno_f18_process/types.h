@@ -45,33 +45,6 @@ struct MultiplePattern
         :HName(h), LName(l), FName(f), patternNumber(p) {}
 };
 
-struct PatternsInfo
-{
-public:
-    PatternsInfo() :acti_member(0){};
-
-    void SetActiNumber(int a)
-    {
-        if ((acti_member == 0 && a == 2) ||
-            (acti_member == 2 && a == 2))
-        {
-            acti_member = 2;
-        }
-        else
-        {
-            acti_member = 1;
-        }
-    };
-
-    int GetActiNumber(){ return acti_member; };
-
-    int patternNubmer;
-    vector<MultiplePattern> Patterns;
-
-private:
-    int acti_member;
-};
-
 struct PatternFile
 {
     string fileName;

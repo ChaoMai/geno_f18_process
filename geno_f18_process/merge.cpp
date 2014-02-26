@@ -41,7 +41,7 @@ void Merge::ReadPatterns(string folder, vector<string> files, vector<PatternFile
 {
     for (string file : files)
     {
-        if (file.find("pattern") == string::npos)
+        if (file.find("pattern_hebing") == string::npos)
         {
             continue;
         }
@@ -60,11 +60,7 @@ void Merge::ReadPatterns(string folder, vector<string> files, vector<PatternFile
 
         ifs >> row1;
 
-        if (row1 == "none")
-        {
-            continue;
-        }
-        else if (row1 != "pattern_id")
+        if (row1 != "pattern_id")
         {
             cerr << "fatal error: file " << file << " has error" << endl;
             exit(1);
@@ -121,7 +117,7 @@ void Merge::ReadPatterns(string folder, vector<string> files, vector<PatternFile
 
 void Merge::ExportToPatternFile(vector<PatternFile>& patterns)
 {
-    string fileName = patternFolder + "\\pattern_hebing_all";
+    string fileName = patternFolder + "\\pattern_all";
 
     ofstream ofs;
     ofs.open(fileName, ios::out);

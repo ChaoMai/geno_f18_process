@@ -19,7 +19,7 @@ public:
 private:
     string outputLocation;
     string saveId;
-    PatternsInfo patternsInfo;
+    vector<MultiplePattern> patternsInfo;
 
     void Differentiate(GenomeSequenceInfo &,
         GenomeSequenceInfo &,
@@ -29,7 +29,7 @@ private:
 
     int CheckPattern(string);
 
-    void ExportToPatternFile(PatternsInfo);
+    void ExportToPatternFile(vector<MultiplePattern>);
 };
 
 #endif //_PATTERN_H_

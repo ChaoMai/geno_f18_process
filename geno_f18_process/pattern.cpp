@@ -18,8 +18,11 @@ void Pattern::Differentiate(GenomeSequenceInfo &FSequence,
         (LSequence.Sequences.size() == 0))
     {
         //return 6;
-        patternsInfo.SetActiNumber(1);
-        patternsInfo.patternNubmer = 6;
+        patternsInfo.push_back(MultiplePattern(
+            HSequence.Sequences.begin()->sequenceName,
+            "none",
+            FSequence.Sequences.begin()->sequenceName,
+            6));
         return;
     }
 
@@ -29,8 +32,11 @@ void Pattern::Differentiate(GenomeSequenceInfo &FSequence,
         (HSequence.Sequences.size() == 0))
     {
         //return 7;
-        patternsInfo.SetActiNumber(1);
-        patternsInfo.patternNubmer = 7;
+        patternsInfo.push_back(MultiplePattern(
+            "none",
+            LSequence.Sequences.begin()->sequenceName,
+            FSequence.Sequences.begin()->sequenceName,
+            6));
         return;
     }
 
@@ -49,17 +55,25 @@ void Pattern::Differentiate(GenomeSequenceInfo &FSequence,
             {
                 string fStr = fItera->sequence;
 
+                string hName = hItera->sequenceId + "_" + hItera->sequenceName;
+                string lName = lItera->sequenceId + "_" + lItera->sequenceName;
+                string fName = fItera->sequenceId + "_" + fItera->sequenceName;
+
                 //pattern 9
                 if (hStr == lStr && lStr == fStr)
                 {
                     //pattern 9
-                    patternsInfo.SetActiNumber(1);
-                    patternsInfo.patternNubmer = 9;
+                    patternsInfo.push_back(MultiplePattern(hName, lName, fName, 9));
                     return;
                 }
 
-                float mutationPointCount(0);
+                int mutationPointCount(0);
                 string fSeqEncode;
+
+                int hMutationCount(0);
+                int lMutationCount(0);
+                char preMutatoinSeq = 'n';
+                char curMutatoinSeq = 'n';
 
                 string::iterator hStrItera = hStr.begin();
                 string::iterator lStrItera = lStr.begin();
@@ -67,72 +81,66 @@ void Pattern::Differentiate(GenomeSequenceInfo &FSequence,
                     fStrItera != fStr.end();
                     fStrItera++, hStrItera++, lStrItera++)
                 {
-                    if (*fStrItera == *hStrItera)
-                    {
-                        fSeqEncode.push_back('h');
-                    }
-                    else if (*fStrItera == *lStrItera)
-                    {
-                        fSeqEncode.push_back('l');
-                    }
-                    else
+                    if (*fStrItera != *hStrItera && *fStrItera != *lStrItera)
                     {
                         mutationPointCount++;
-                        fSeqEncode.push_back('n');
+                        continue;
+                    }
+
+                    if (*fStrItera == *hStrItera && *fStrItera != *lStrItera)
+                    {
+                        lMutationCount++;
+                    }
+
+                    if (*fStrItera == *lStrItera && *fStrItera != *hStrItera)
+                    {
+                        hMutationCount++;
+                    }
+
+                    if (fStrItera == fStr.end() - 1)
+                    {
+                        if (hMutationCount == 0 && lMutationCount > fStr.length() * 0.005)
+                        {
+                            fSeqEncode.push_back('h');
+                        }
+
+                        if (lMutationCount == 0 && hMutationCount > fStr.length() * 0.005)
+                        {
+                            fSeqEncode.push_back('l');
+                        }
+                    }
+
+                    if (hMutationCount != 0 && lMutationCount != 0)
+                    {
+                        if (hMutationCount / lMutationCount >= 3 && hMutationCount * lMutationCount != 1)
+                        {
+                            fSeqEncode.push_back('l');
+                            lMutationCount = 0;
+                            hMutationCount = 0;
+                        }
+                        else if (lMutationCount / hMutationCount >= 3 && hMutationCount * lMutationCount != 1)
+                        {
+                            fSeqEncode.push_back('h');
+                            lMutationCount = 0;
+                            hMutationCount = 0;
+                        }
                     }
                 }
 
-                if ((mutationPointCount / fStr.size()) <= 0.1)
+                if ((mutationPointCount / fStr.length()) <= 0.05)
                 {
                     string reducedStr;
                     ReduceSequence(fSeqEncode, reducedStr);
-
                     int patternNumber = CheckPattern(reducedStr);
 
-                    switch (patternNumber)
-                    {
-                    case 1:
-                    case 2:
-                    case 3:
-                    case 4:
-                    case 5:
-                    {
-                        //pattern 1~5
-                        string hName = hItera->sequenceId + "_" + hItera->sequenceName;
-                        string lName = lItera->sequenceId + "_" + lItera->sequenceName;
-                        string fName = fItera->sequenceId + "_" + fItera->sequenceName;
-                        patternsInfo.SetActiNumber(2);
-                        patternsInfo.Patterns.push_back(MultiplePattern(hName, lName, fName, patternNumber));
-                        break;
-                    }
-                    case 6:
-                    case 7:
-                    {
-                        //pattern 6~7
-                        patternsInfo.SetActiNumber(1);
-                        patternsInfo.patternNubmer = patternNumber;
-                        return;
-                    }
-                    case 8:
-                    {
-                        //pattern 8
-                        string hName = hItera->sequenceId + "_" + hItera->sequenceName;
-                        string lName = lItera->sequenceId + "_" + lItera->sequenceName;
-                        string fName = fItera->sequenceId + "_" + fItera->sequenceName;
-                        patternsInfo.SetActiNumber(2);
-                        patternsInfo.Patterns.push_back(MultiplePattern(hName, lName, fName, 8));
-                        break;
-                    }
-                    }
+                    cout << fSeqEncode << " " << reducedStr << endl;
+
+                    patternsInfo.push_back(MultiplePattern(hName, lName, fName, patternNumber));
                 }
                 else
                 {
                     //pattern 8
-                    string hName = hItera->sequenceId + "_" + hItera->sequenceName;
-                    string lName = lItera->sequenceId + "_" + lItera->sequenceName;
-                    string fName = fItera->sequenceId + "_" + fItera->sequenceName;
-                    patternsInfo.SetActiNumber(2);
-                    patternsInfo.Patterns.push_back(MultiplePattern(hName, lName, fName, 8));
+                    patternsInfo.push_back(MultiplePattern(hName, lName, fName, 8));
                 }
             }
         }
@@ -154,6 +162,7 @@ void Pattern::ReduceSequence(string fSeqEncode, string &reducedStr)
     }
 
     string tmpReducedStr;
+
     while (!seSStr.eof())
     {
         seSStr >> curCh;
@@ -165,52 +174,155 @@ void Pattern::ReduceSequence(string fSeqEncode, string &reducedStr)
 
         tmpReducedStr.push_back(preCh);
 
-        if (preCh != curCh || seSStr.eof())
+        if (reducedStr.length() != 0)
         {
-            if (tmpReducedStr.size() <= 2)
+            if (reducedStr.back() != tmpReducedStr[0])
             {
-                tmpReducedStr.clear();
-                preCh = curCh;
-                continue;
-            }
-            else
-            {
-                if (reducedStr.size() != 0)
-                {
-                    if (reducedStr.back() == tmpReducedStr[0])
-                    {
-                        tmpReducedStr.clear();
-                        preCh = curCh;
-                        continue;
-                    }
-                    else
-                    {
-                        reducedStr.push_back(tmpReducedStr[0]);
-                        tmpReducedStr.clear();
-                        preCh = curCh;
-                    }
-                }
-                else
-                {
-                    reducedStr.push_back(tmpReducedStr[0]);
-                    tmpReducedStr.clear();
-                    preCh = curCh;
-                }
+                reducedStr.push_back(tmpReducedStr[0]);
             }
         }
+        else
+        {
+            reducedStr.push_back(tmpReducedStr[0]);
+        }
+
+        tmpReducedStr.clear();
+
+        preCh = curCh;
     }
+
+    //int hCount(0);
+    //int lCount(0);
+
+    //for (char ch : fSeqEncode)
+    //{
+    //    if (ch == 'h')
+    //    {
+    //        hCount++;
+    //    }
+    //    else if (ch == 'l')
+    //    {
+    //        lCount++;
+    //    }
+    //}
+
+    //if (hCount <= fSeqEncode.length() * 0.01)
+    //{
+    //    reducedStr.push_back('l');
+    //    return;
+    //}
+    //else if (lCount <= fSeqEncode.length() * 0.01)
+    //{
+    //    reducedStr.push_back('h');
+    //    return;
+    //}
+
+    //stringstream seSStr(fSeqEncode);
+
+    ////read first character
+    //char preCh;
+    //char curCh;
+    //seSStr >> preCh;
+
+    //while (preCh == 'n')
+    //{
+    //    seSStr >> preCh;
+    //}
+
+    //string tmpReducedStr;
+
+    //while (!seSStr.eof())
+    //{
+    //    seSStr >> curCh;
+
+    //    if (curCh == 'n')
+    //    {
+    //        continue;
+    //    }
+
+    //    tmpReducedStr.push_back(preCh);
+
+    //    if (preCh != curCh || seSStr.eof())
+    //    {
+    //        if (tmpReducedStr.length() <= 1)
+    //        {
+    //            string remainingStr;
+
+    //            streamoff pos(0);
+    //            bool isSetPos = false;
+
+    //            if (!seSStr.eof())
+    //            {
+    //                pos = seSStr.tellg();
+    //                isSetPos = true;
+    //            }
+
+    //            getline(seSStr, remainingStr);
+
+    //            if (remainingStr.length() == 0)
+    //            {
+    //                break;
+    //            }
+
+    //            unsigned int distance(1);
+
+    //            while (distance < 200)
+    //            {
+    //                if (distance >= remainingStr.length() || remainingStr[distance] == tmpReducedStr[0])
+    //                {
+    //                    break;
+    //                }
+
+    //                distance++;
+    //            }
+
+    //            if (distance < 200)
+    //            {
+    //                if (reducedStr.length() != 0)
+    //                {
+    //                    if (reducedStr.back() != tmpReducedStr[0])
+    //                    {
+    //                        reducedStr.push_back(tmpReducedStr[0]);
+    //                    }
+    //                }
+    //                else
+    //                {
+    //                    reducedStr.push_back(tmpReducedStr[0]);
+    //                }
+    //            }
+
+    //            if (isSetPos)
+    //            {
+    //                seSStr.seekg(pos);
+    //            }
+
+    //            tmpReducedStr.clear();
+    //        }
+    //        else
+    //        {
+    //            if (reducedStr.length() != 0)
+    //            {
+    //                if (reducedStr.back() != tmpReducedStr[0])
+    //                {
+    //                    reducedStr.push_back(tmpReducedStr[0]);
+    //                }
+    //            }
+    //            else
+    //            {
+    //                reducedStr.push_back(tmpReducedStr[0]);
+    //            }
+
+    //            tmpReducedStr.clear();
+    //        }
+    //    }
+
+    //    preCh = curCh;
+    //}
 }
 
 int Pattern::CheckPattern(string reducedStr)
 {
-    int length = reducedStr.size();
-
-    if (length <= 0)
-    {
-        return 8;
-        //cerr << "fatal error: reducing error" << endl;
-        //exit(1);
-    }
+    int length = reducedStr.length();
 
     if (length == 1)
     {
@@ -233,7 +345,7 @@ int Pattern::CheckPattern(string reducedStr)
             return 1;
         }
         //pattern 2
-        else if (reducedStr[0] = 'l'&&reducedStr[1] == 'h')
+        else if (reducedStr[0] = 'l' && reducedStr[1] == 'h')
         {
             return 2;
         }
@@ -251,14 +363,10 @@ int Pattern::CheckPattern(string reducedStr)
             return 3;
         }
     }
-    //else if (length >= 4)
-    //{
-    //    return 5;
-    //}
     return 5;
 }
 
-void Pattern::ExportToPatternFile(PatternsInfo info)
+void Pattern::ExportToPatternFile(vector<MultiplePattern> info)
 {
     string fileName = outputLocation + "pattern_hebing_" + saveId;
     cout << "saving pattern info " + saveId << endl;
@@ -274,37 +382,17 @@ void Pattern::ExportToPatternFile(PatternsInfo info)
 
     stringstream sstr;
 
-    switch (info.GetActiNumber())
-    {
-    case 1:
-    {
-        sstr << "pattern_id\t" << "pattern" << endl
-            << "1\t" << info.patternNubmer << endl;
-        break;
-    }
-    case 2:
-    {
-        sstr << "pattern_id\t" << "h_name\t" << "l_name\t" << "f_name\t" << "pattern" << endl;
 
-        for (vector<MultiplePattern>::iterator itera = info.Patterns.begin();
-            itera != info.Patterns.end(); itera++)
-        {
-            sstr << itera - info.Patterns.begin() + 1 << '\t'
-                << itera->HName << '\t'
-                << itera->LName << '\t'
-                << itera->FName << '\t'
-                << itera->patternNumber << endl;
-        }
+    sstr << "pattern_id\t" << "h_name\t" << "l_name\t" << "f_name\t" << "pattern" << endl;
 
-        break;
-    }
-    default:
+    for (vector<MultiplePattern>::iterator itera = info.begin();
+        itera != info.end(); itera++)
     {
-        sstr << "none";
-        //cerr << "fatal error: acti_member isn't seted for " << saveId << endl;
-        //exit(1);
-        break;
-    }
+        sstr << itera - info.begin() + 1 << '\t'
+            << itera->HName << '\t'
+            << itera->LName << '\t'
+            << itera->FName << '\t'
+            << itera->patternNumber << endl;
     }
 
     ofs << sstr.rdbuf();
