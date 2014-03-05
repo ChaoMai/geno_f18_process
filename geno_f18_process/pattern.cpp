@@ -127,7 +127,7 @@ void Pattern::Differentiate(GenomeSequenceInfo &FSequence,
                     }
                 }
 
-                if ((mutationPointCount / fStr.length()) <= 0.05)
+                if (((float)mutationPointCount / fStr.length()) <= 0.02)
                 {
                     string reducedStr;
                     ReduceSequence(fSeqEncode, reducedStr);
@@ -190,134 +190,6 @@ void Pattern::ReduceSequence(string fSeqEncode, string &reducedStr)
 
         preCh = curCh;
     }
-
-    //int hCount(0);
-    //int lCount(0);
-
-    //for (char ch : fSeqEncode)
-    //{
-    //    if (ch == 'h')
-    //    {
-    //        hCount++;
-    //    }
-    //    else if (ch == 'l')
-    //    {
-    //        lCount++;
-    //    }
-    //}
-
-    //if (hCount <= fSeqEncode.length() * 0.01)
-    //{
-    //    reducedStr.push_back('l');
-    //    return;
-    //}
-    //else if (lCount <= fSeqEncode.length() * 0.01)
-    //{
-    //    reducedStr.push_back('h');
-    //    return;
-    //}
-
-    //stringstream seSStr(fSeqEncode);
-
-    ////read first character
-    //char preCh;
-    //char curCh;
-    //seSStr >> preCh;
-
-    //while (preCh == 'n')
-    //{
-    //    seSStr >> preCh;
-    //}
-
-    //string tmpReducedStr;
-
-    //while (!seSStr.eof())
-    //{
-    //    seSStr >> curCh;
-
-    //    if (curCh == 'n')
-    //    {
-    //        continue;
-    //    }
-
-    //    tmpReducedStr.push_back(preCh);
-
-    //    if (preCh != curCh || seSStr.eof())
-    //    {
-    //        if (tmpReducedStr.length() <= 1)
-    //        {
-    //            string remainingStr;
-
-    //            streamoff pos(0);
-    //            bool isSetPos = false;
-
-    //            if (!seSStr.eof())
-    //            {
-    //                pos = seSStr.tellg();
-    //                isSetPos = true;
-    //            }
-
-    //            getline(seSStr, remainingStr);
-
-    //            if (remainingStr.length() == 0)
-    //            {
-    //                break;
-    //            }
-
-    //            unsigned int distance(1);
-
-    //            while (distance < 200)
-    //            {
-    //                if (distance >= remainingStr.length() || remainingStr[distance] == tmpReducedStr[0])
-    //                {
-    //                    break;
-    //                }
-
-    //                distance++;
-    //            }
-
-    //            if (distance < 200)
-    //            {
-    //                if (reducedStr.length() != 0)
-    //                {
-    //                    if (reducedStr.back() != tmpReducedStr[0])
-    //                    {
-    //                        reducedStr.push_back(tmpReducedStr[0]);
-    //                    }
-    //                }
-    //                else
-    //                {
-    //                    reducedStr.push_back(tmpReducedStr[0]);
-    //                }
-    //            }
-
-    //            if (isSetPos)
-    //            {
-    //                seSStr.seekg(pos);
-    //            }
-
-    //            tmpReducedStr.clear();
-    //        }
-    //        else
-    //        {
-    //            if (reducedStr.length() != 0)
-    //            {
-    //                if (reducedStr.back() != tmpReducedStr[0])
-    //                {
-    //                    reducedStr.push_back(tmpReducedStr[0]);
-    //                }
-    //            }
-    //            else
-    //            {
-    //                reducedStr.push_back(tmpReducedStr[0]);
-    //            }
-
-    //            tmpReducedStr.clear();
-    //        }
-    //    }
-
-    //    preCh = curCh;
-    //}
 }
 
 int Pattern::CheckPattern(string reducedStr)

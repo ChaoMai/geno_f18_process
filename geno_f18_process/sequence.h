@@ -30,7 +30,7 @@ private:
 
     void ProcessSequence(vector<int>, string);
 
-    void LoadSequenceFiles(vector<int>,
+    int LoadSequenceFiles(vector<int>,
         GenomeSequenceInfo &,
         GenomeSequenceInfo &,
         GenomeSequenceInfo &);

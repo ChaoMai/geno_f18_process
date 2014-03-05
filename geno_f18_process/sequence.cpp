@@ -124,7 +124,12 @@ void Sequence::ProcessSequence(vector<int> ids, string genoName)
     GenomeSequenceInfo LSequences;
 
     //combine files
-    LoadSequenceFiles(ids, FSequences, HSequences, LSequences);
+    int loadStatus = LoadSequenceFiles(ids, FSequences, HSequences, LSequences);
+
+    if (loadStatus == 1)
+    {
+        return;
+    }
 
     //Remove Redundancy and Short
     RemoveRedundancyAndShort(FSequences);
@@ -140,7 +145,7 @@ void Sequence::ProcessSequence(vector<int> ids, string genoName)
     CompareAndRemove(FSequences, HSequences, LSequences, saveId);
 }
 
-void Sequence::LoadSequenceFiles(vector<int> ids,
+int Sequence::LoadSequenceFiles(vector<int> ids,
     GenomeSequenceInfo &FSequence,
     GenomeSequenceInfo &HSequence,
     GenomeSequenceInfo &LSequence)
@@ -158,13 +163,15 @@ void Sequence::LoadSequenceFiles(vector<int> ids,
 
         if (!ifs)
         {
-            cerr << "fatal error: failed to open sequence file " << fileId << endl;
-            exit(1);
+            cerr << "error: failed to open sequence file " << fileId << endl;
+            return 1;
         }
 
         ReadSequenceToVector(ifs, FSequence, HSequence, LSequence, fileId);
         ifs.close();
     }
+
+    return 0;
 }
 
 void Sequence::ReadSequenceToVector(ifstream &ifs,
