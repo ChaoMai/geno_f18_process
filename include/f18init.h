@@ -5,3 +5,4 @@
 #include "sequence.h"
 #include "merge.h"
 #include "utilities.h"
+#include "param.h"
