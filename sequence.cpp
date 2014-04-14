@@ -1,15 +1,10 @@
-#include "include/sequence.h"
+#include "sequence.h"
 
 Sequence::Sequence(Param param)
 {
 	filesLocation = param.filesLocation;
 	homologousAnnotationFile = param.homologousAnnotationFile;
 	outputLocation = param.outputLocation;
-	prankExeLocation = param.prankExeLocation;
-
-//	wstring wStr = wstring(outputLocation.begin(), outputLocation.end());
-//	cout << "create output folder: \"" << outputLocation << "\"" << endl;
-//	_wmkdir(wStr.c_str());
 
 	struct stat st =
 	{ 0 };
@@ -98,7 +93,6 @@ void Sequence::ProcessData()
 
 	vector<int> ids;
 	vector<thread> workers;
-	int workersCount = 0;
 
 	for (auto itera = homologousAnnotations.begin();
 			itera != homologousAnnotations.end(); itera++)
@@ -112,19 +106,14 @@ void Sequence::ProcessData()
 		{
 			workers.push_back(
 					thread(&Sequence::ProcessSequence, this, ids, headName));
-			workersCount++;
 			ids.clear();
 		}
 
-		if (workersCount >= param.threadNum)
+		for (std::thread &t : workers)
 		{
-			for (std::thread &t : workers)
+			if (t.joinable())
 			{
-				if (t.joinable())
-				{
-					t.join();
-					workersCount--;
-				}
+				t.join();
 			}
 		}
 	}
@@ -176,17 +165,23 @@ int Sequence::LoadSequenceFiles(vector<int> ids, GenomeSequenceInfo &FSequence,
 			return 1;
 		}
 
-		ReadSequenceToVector(ifs, FSequence, HSequence, LSequence, fileId);
+		if (ReadSequenceToVector(ifs, FSequence, HSequence, LSequence, fileId)
+				== 1)
+		{
+			return 1;
+		}
 		ifs.close();
 	}
 
 	return 0;
 }
 
-void Sequence::ReadSequenceToVector(ifstream &ifs,
-		GenomeSequenceInfo &FSequence, GenomeSequenceInfo &HSequence,
-		GenomeSequenceInfo &LSequence, string fileId)
+int Sequence::ReadSequenceToVector(ifstream &ifs, GenomeSequenceInfo &FSequence,
+		GenomeSequenceInfo &HSequence, GenomeSequenceInfo &LSequence,
+		string fileId)
 {
+	int count(0);
+
 	while (!ifs.eof())
 	{
 		char ch;
@@ -235,6 +230,7 @@ void Sequence::ReadSequenceToVector(ifstream &ifs,
 			}
 			FSequence.Sequences.push_back(
 					GenomeSequence(tmpId, tmpName, tmpBaseInfo, tmpSequence));
+			count++;
 			break;
 		}
 		case 'h':
@@ -245,6 +241,7 @@ void Sequence::ReadSequenceToVector(ifstream &ifs,
 			}
 			HSequence.Sequences.push_back(
 					GenomeSequence(tmpId, tmpName, tmpBaseInfo, tmpSequence));
+			count++;
 			break;
 		}
 		case 'l':
@@ -255,6 +252,7 @@ void Sequence::ReadSequenceToVector(ifstream &ifs,
 			}
 			LSequence.Sequences.push_back(
 					GenomeSequence(tmpId, tmpName, tmpBaseInfo, tmpSequence));
+			count++;
 			break;
 		}
 		default:
@@ -263,6 +261,12 @@ void Sequence::ReadSequenceToVector(ifstream &ifs,
 			exit(1);
 		}
 	}
+
+	if (count == 0)
+	{
+		return 1;
+	}
+	return 0;
 }
 
 void Sequence::RemoveRedundancyAndShort(GenomeSequenceInfo &Seq)
@@ -296,23 +300,19 @@ void Sequence::CompareAndRemove(GenomeSequenceInfo &FSequences,
 	string faFileName = "tmp" + saveId + ".fa";
 	ExportToFaFile(faFileName, FSequences, HSequences, LSequences);
 
-	string prankOutPutFileName = "tmp" + saveId;
-//	string cmd = prankExeLocation + "\" -d=" + faFileName + " -o="
-//			+ prankOutPutFileName + "  -iterate=2 -quiet -F\"";
-//	cmd.insert(cmd.begin(), '\"');
-//	cmd.insert(cmd.begin(), '\"');
-	string cmd = prankExeLocation + " -d=" + faFileName + " -o="
-			+ prankOutPutFileName + " -iterate=" + to_string(param.prankIterate)
-			+ " -quiet -F";
-	system(cmd.c_str());
+	string mafftOutPutFileName = "tmp" + saveId + ".fas";
+	string cmd = "mafft --maxiterate " + to_string(param.mafftIterate)
+			+ " --thread " + to_string(param.mafftThread) + " " + faFileName
+			+ " > " + mafftOutPutFileName;
+
+	system(("export MAFFT_BINARIES=/usr/lib/mafft/lib/mafft/; " + cmd).c_str());
 
 	ifstream ifs;
-	prankOutPutFileName.append(".best.fas");
-	ifs.open(prankOutPutFileName);
+	ifs.open(mafftOutPutFileName);
 
 	if (!ifs)
 	{
-		cerr << "fatal error: failed to open file " + prankOutPutFileName
+		cerr << "fatal error: failed to open file " + mafftOutPutFileName
 				<< endl;
 		return;
 		//exit(1);
@@ -323,7 +323,7 @@ void Sequence::CompareAndRemove(GenomeSequenceInfo &FSequences,
 	GenomeSequenceInfo RLSequences;
 
 	//read sequence to vector
-	ReadPrankSequenceToVector(ifs, RFSequences, RHSequences, RLSequences);
+	ReadSequenceToVector(ifs, RFSequences, RHSequences, RLSequences, saveId);
 
 	//remove same sequence that is short
 	RemoveSameShort(RFSequences);
@@ -344,11 +344,7 @@ void Sequence::CompareAndRemove(GenomeSequenceInfo &FSequences,
 
 	ifs.close();
 
-//	wstring wfaFileName = wstring(faFileName.begin(), faFileName.end());
-//	wstring wprankOutPutFileName = wstring(prankOutPutFileName.begin(),
-//			prankOutPutFileName.end());
-
-	remove(prankOutPutFileName.c_str());
+	remove(mafftOutPutFileName.c_str());
 	remove(faFileName.c_str());
 }
 

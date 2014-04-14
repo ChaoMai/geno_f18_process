@@ -1,4 +1,4 @@
-#include "include/merge.h"
+#include "merge.h"
 
 void Merge::MergePatternFiles()
 {
@@ -12,30 +12,6 @@ void Merge::MergePatternFiles()
 
 void Merge::GetAllFilesNamesWithinFolder(string folder, vector<string>& names)
 {
-//    folder.append("\\*.*");
-//
-//    wstring wstr = wstring(folder.begin(), folder.end());
-//    const wchar_t* szFolder = wstr.c_str();
-//
-//    WIN32_FIND_DATA fd;
-//    HANDLE hFind = FindFirstFile(szFolder, &fd);
-//    if (hFind != INVALID_HANDLE_VALUE)
-//    {
-//        do
-//        {
-//            if (!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
-//            {
-//                char ch[260];
-//                char DefChar = ' ';
-//                WideCharToMultiByte(CP_ACP, 0, fd.cFileName, -1, ch, 260, &DefChar, NULL);
-//                string str(ch);
-//
-//                names.push_back(str);
-//            }
-//        } while (::FindNextFile(hFind, &fd));
-//        FindClose(hFind);
-//    }
-
 	DIR *dir;
 	struct dirent *ent;
 	struct stat st;

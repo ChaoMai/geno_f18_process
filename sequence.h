@@ -33,7 +33,6 @@ private:
 	string filesLocation;
 	string homologousAnnotationFile;
 	string outputLocation;
-	string prankExeLocation;
 
 	mutex coutMutex;
 
@@ -44,7 +43,7 @@ private:
 	int LoadSequenceFiles(vector<int>, GenomeSequenceInfo &,
 			GenomeSequenceInfo &, GenomeSequenceInfo &);
 
-	void ReadSequenceToVector(ifstream &, GenomeSequenceInfo &,
+	int ReadSequenceToVector(ifstream &, GenomeSequenceInfo &,
 			GenomeSequenceInfo &, GenomeSequenceInfo &, string);
 
 	void RemoveRedundancyAndShort(GenomeSequenceInfo &);

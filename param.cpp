@@ -1,6 +1,6 @@
-#include "include/param.h"
+#include "param.h"
 
 Param::Param() :
-		threadNum(1), prankIterate(2), mutationRate(0.04)
+		mafftNum(1), mafftThread(4), mafftIterate(1000), mutationRate(0.032)
 {
 }

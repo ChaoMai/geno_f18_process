@@ -1,4 +1,4 @@
-#include "include/f18init.h"
+#include "f18init.h"
 
 using namespace std;
 
@@ -56,14 +56,14 @@ void mGetOptions(int argc, char* argv[], Param& param)
 		case 'o':
 			param.outputLocation = argv[++i];
 			break;
-		case 'p':
-			param.prankExeLocation = argv[++i];
+		case 'n':
+			param.mafftNum = atoi(argv[++i]);
 			break;
 		case 't':
-			param.threadNum = atoi(argv[++i]);
+			param.mafftThread = atoi(argv[++i]);
 			break;
 		case 'i':
-			param.prankIterate=atoi(argv[++i]);
+			param.mafftIterate = atoi(argv[++i]);
 			break;
 		case 'm':
 			param.mutationRate = atof(argv[++i]);

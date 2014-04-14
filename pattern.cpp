@@ -1,4 +1,4 @@
-#include "include/pattern.h"
+#include "pattern.h"
 
 void Pattern::DifferentiatePattern(GenomeSequenceInfo &FSequence,
 		GenomeSequenceInfo &HSequence, GenomeSequenceInfo &LSequence)

@@ -9,9 +9,9 @@ public:
 	string filesLocation;
 	string homologousAnnotationFile;
 	string outputLocation;
-	string prankExeLocation;
-	int threadNum;
-	int prankIterate;
+	int mafftNum;
+	int mafftThread;
+	int mafftIterate;
 	float mutationRate;
 
 	Param();
