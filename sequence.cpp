@@ -74,25 +74,7 @@ void Sequence::LoadHomologousAnnotationFile()
 
 void Sequence::ProcessData()
 {
-//	vector<int> ids;
-//
-//	for (auto itera = homologousAnnotations.begin();
-//			itera != homologousAnnotations.end(); itera++)
-//	{
-//		string headName = itera->genoName;
-//
-//		ids.push_back(itera->fileId);
-//
-//		if (itera == homologousAnnotations.end() - 1
-//				|| headName != (itera + 1)->genoName)
-//		{
-//			ProcessSequence(ids, headName);
-//			ids.clear();
-//		}
-//	}
-
 	vector<int> ids;
-	vector<thread> workers;
 
 	for (auto itera = homologousAnnotations.begin();
 			itera != homologousAnnotations.end(); itera++)
@@ -104,19 +86,37 @@ void Sequence::ProcessData()
 		if (itera == homologousAnnotations.end() - 1
 				|| headName != (itera + 1)->genoName)
 		{
-			workers.push_back(
-					thread(&Sequence::ProcessSequence, this, ids, headName));
+			ProcessSequence(ids, headName);
 			ids.clear();
 		}
-
-		for (std::thread &t : workers)
-		{
-			if (t.joinable())
-			{
-				t.join();
-			}
-		}
 	}
+
+//	vector<int> ids;
+//	vector<thread> workers;
+//
+//	for (auto itera = homologousAnnotations.begin();
+//			itera != homologousAnnotations.end(); itera++)
+//	{
+//		string headName = itera->genoName;
+//
+//		ids.push_back(itera->fileId);
+//
+//		if (itera == homologousAnnotations.end() - 1
+//				|| headName != (itera + 1)->genoName)
+//		{
+//			workers.push_back(
+//					thread(&Sequence::ProcessSequence, this, ids, headName));
+//			ids.clear();
+//		}
+//
+//		for (std::thread &t : workers)
+//		{
+//			if (t.joinable())
+//			{
+//				t.join();
+//			}
+//		}
+//	}
 }
 
 void Sequence::ProcessSequence(vector<int> ids, string genoName)
