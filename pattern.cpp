@@ -64,11 +64,19 @@ void Pattern::Differentiate(GenomeSequenceInfo &FSequence,
 				int mutationPointCount(0);
 				string fSeqEncode;
 
-				int hMutationCount(0);
-				int lMutationCount(0);
+				bool isInEnds(false);
+				int mutationP10Count(0);
+				bool isCandidateOfPattern10(false);
+
+				char preEncode('\0');
+				string::iterator preMutationLoc(fStr.begin());
+
+				char curEncode;
+				string::iterator curMutationLoc;
 
 				auto hStrItera = hStr.begin();
 				auto lStrItera = lStr.begin();
+
 				for (auto fStrItera = fStr.begin(); fStrItera != fStr.end();
 						fStrItera++, hStrItera++, lStrItera++)
 				{
@@ -78,59 +86,77 @@ void Pattern::Differentiate(GenomeSequenceInfo &FSequence,
 						continue;
 					}
 
+					if (((float) distance(fStr.begin(), fStrItera)
+							<= (float) fStr.length() * 0.05)
+							|| ((float) distance(fStrItera, fStr.end())
+									<= (float) fStr.length() * 0.05))
+					{
+						isInEnds = true;
+					}
+					else
+					{
+						isInEnds = false;
+						mutationP10Count = 0;
+					}
+
 					if (*fStrItera == *hStrItera && *fStrItera != *lStrItera)
 					{
-						lMutationCount++;
+						curEncode = 'h';
+						curMutationLoc = fStrItera;
 					}
 
 					if (*fStrItera == *lStrItera && *fStrItera != *hStrItera)
 					{
-						hMutationCount++;
+						curEncode = 'l';
+						curMutationLoc = fStrItera;
 					}
 
-					if (fStrItera == fStr.end() - 1)
+					if (preEncode != curEncode)
 					{
-						if (hMutationCount == 0
-								&& lMutationCount > fStr.length() * 0.005)
+						if (isInEnds == true)
 						{
-							fSeqEncode.push_back('h');
+							if (distance(preMutationLoc, curMutationLoc) == 1)
+							{
+								mutationP10Count++;
+							}
+							else
+							{
+								mutationP10Count = 0;
+							}
+
+							//mutation occoured once, so the count is 7
+							if (mutationP10Count >= 7)
+							{
+								//might be pattern 10
+								isCandidateOfPattern10 = true;
+							}
 						}
 
-						if (lMutationCount == 0
-								&& hMutationCount > fStr.length() * 0.005)
-						{
-							fSeqEncode.push_back('l');
-						}
+						fSeqEncode.push_back(curEncode);
 					}
 
-					if (hMutationCount != 0 && lMutationCount != 0)
-					{
-						if (hMutationCount / lMutationCount >= 3
-								&& hMutationCount * lMutationCount != 1)
-						{
-							fSeqEncode.push_back('l');
-							lMutationCount = 0;
-							hMutationCount = 0;
-						}
-						else if (lMutationCount / hMutationCount >= 3
-								&& hMutationCount * lMutationCount != 1)
-						{
-							fSeqEncode.push_back('h');
-							lMutationCount = 0;
-							hMutationCount = 0;
-						}
-					}
+					preEncode = curEncode;
+					preMutationLoc = curMutationLoc;
 				}
 
-				if (((float) mutationPointCount / fStr.length()) <= param.mutationRate)
+				if (((float) mutationPointCount / fStr.length())
+						<= param.mutationRate)
 				{
-					string reducedStr;
-					ReduceSequence(fSeqEncode, reducedStr);
-					int patternNumber = CheckPattern(reducedStr);
+					if (isCandidateOfPattern10 == true)
+					{
+						patternsInfo.push_back(
+								MultiplePattern(hName, lName, fName, 10));
+					}
+					else
+					{
+						string reducedStr;
+						ReduceSequence(fSeqEncode, reducedStr);
+						int patternNumber = CheckPattern(reducedStr);
 
-					patternsInfo.push_back(
-							MultiplePattern(hName, lName, fName,
-									patternNumber));
+						patternsInfo.push_back(
+								MultiplePattern(hName, lName, fName,
+										patternNumber));
+					}
 				}
 				else
 				{
