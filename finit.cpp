@@ -1,4 +1,4 @@
-#include "f18init.h"
+#include "finit.h"
 
 using namespace std;
 

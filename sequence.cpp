@@ -629,7 +629,7 @@ void Sequence::RemoveContinuousVariant(GenomeSequenceInfo &RFSequences,
 			{
 				for (size_t i = 0; i < bpMatrix.size(); i++)
 				{
-					if (bpsFreq[i] <= (bpMatrix.size() * 0.5))
+					if ((float)bpsFreq[i] <= (float)(bpMatrix.size() * 0.5))
 					{
 						mutationPointCount[i] += 1;
 					}
