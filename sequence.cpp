@@ -301,9 +301,10 @@ void Sequence::CompareAndRemove(GenomeSequenceInfo &FSequences,
 	ExportToFaFile(faFileName, FSequences, HSequences, LSequences);
 
 	string mafftOutPutFileName = "tmp" + saveId + ".fas";
-	string cmd = "mafft --maxiterate " + to_string(param.mafftIterate)
-			+ " --thread " + to_string(param.mafftThread) + " " + faFileName
-			+ " > " + mafftOutPutFileName;
+	string cmd = "mafft --retree 2 --maxiterate "
+			+ to_string(param.mafftIterate) + " --thread "
+			+ to_string(param.mafftThread) + " " + faFileName + " > "
+			+ mafftOutPutFileName;
 
 	system(("export MAFFT_BINARIES=/usr/lib/mafft/lib/mafft/; " + cmd).c_str());
 
