@@ -70,6 +70,9 @@ private:
 
 	void RemoveSequence(GenomeSequenceInfo &, GenomeSequenceInfo &,
 			GenomeSequenceInfo &, int);
+
+	bool IsContainsFLH(GenomeSequenceInfo &, GenomeSequenceInfo &,
+			GenomeSequenceInfo &);
 };
 
 #endif //_SEQUENCE_H_

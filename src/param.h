@@ -12,7 +12,7 @@ public:
 	int mafftNum;
 	int mafftThread;
 	int mafftIterate;
-	float mutationRate;
+	double mutationRate;
 
 	Param();
 };
