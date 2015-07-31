@@ -34,8 +34,6 @@ private:
 	string homologousAnnotationFile;
 	string outputLocation;
 
-	mutex coutMutex;
-
 	vector<HomologousAnnotation> homologousAnnotations;
 
 	void ProcessSequence(vector<int>, string);
@@ -75,4 +73,4 @@ private:
 			GenomeSequenceInfo &);
 };
 
-#endif //_SEQUENCE_H_
+#endif //_SEQUENCE_H_

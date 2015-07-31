@@ -138,9 +138,7 @@ int Sequence::LoadSequenceFiles(vector<int> ids, GenomeSequenceInfo &FSequence,
     string fileId(to_string(*itera));
     string fileName = filesLocation + "hebing_" + fileId + ".fa";
 
-    coutMutex.lock();
     cout << "load hebing_" + fileId + ".fa" << endl;
-    coutMutex.unlock();
 
     ifstream ifs;
     ifs.open(fileName);
@@ -265,16 +263,15 @@ void Sequence::CompareAndRemove(GenomeSequenceInfo &FSequences,
                                 GenomeSequenceInfo &HSequences,
                                 GenomeSequenceInfo &LSequences,
                                 string saveId) {
-  string faFileName = "tmp" + saveId + ".fa";
+  string faFileName = "./tmp" + saveId + ".fa";
   ExportToFaFile(faFileName, FSequences, HSequences, LSequences);
 
-  string mafftOutPutFileName = "tmp" + saveId + ".fas";
+  string mafftOutPutFileName = "./tmp" + saveId + ".fas";
   string cmd = "mafft --retree 2 --maxiterate "
                + to_string(param.mafftIterate) + " --thread "
                + to_string(param.mafftThread) + " " + faFileName + " > "
                + mafftOutPutFileName;
 
-  //system(("export MAFFT_BINARIES=/lustre/user/wudd/ChaoMai/data/mafft-linux64/mafftdir/bin; " + cmd).c_str());
   system(cmd.c_str());
 
   ifstream ifs;
@@ -318,8 +315,8 @@ void Sequence::CompareAndRemove(GenomeSequenceInfo &FSequences,
 
   ifs.close();
 
-//  remove(mafftOutPutFileName.c_str());
-//  remove(faFileName.c_str());
+  remove(mafftOutPutFileName.c_str());
+  remove(faFileName.c_str());
 }
 
 void Sequence::ExportToFaFile(string fileName, GenomeSequenceInfo &FSequences,
@@ -497,7 +494,7 @@ void Sequence::RemoveSameShort(GenomeSequenceInfo &Seq) {
         }
       }
 
-      //remove compStr and go check next compStr
+      //remove compStr and check next compStr
       if ((compStrItera == compStr.end()) && isRemoveComp) {
         compItera = Seq.Sequences.erase(compItera);
         continue;

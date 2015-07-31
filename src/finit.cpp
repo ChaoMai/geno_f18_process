@@ -50,9 +50,6 @@ void mGetOptions(int argc, char *argv[], Param &param) {
       case 'o':
         param.outputLocation = argv[++i];
         break;
-      case 'n':
-        param.mafftNum = atoi(argv[++i]);
-        break;
       case 't':
         param.mafftThread = atoi(argv[++i]);
         break;
@@ -62,6 +59,10 @@ void mGetOptions(int argc, char *argv[], Param &param) {
       case 'm':
         param.mutationRate = atof(argv[++i]);
         break;
+      default: {
+        cout << "parameter error!" << endl;
+        exit(1);
+      }
     }
   }
 }
